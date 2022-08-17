@@ -5,16 +5,20 @@
 use std::collections::HashSet;
 
 use bevy::{math::Vec3Swizzles, prelude::*, sprite::collide_aabb::collide};
+use bevy_kira_audio::prelude::*;
+
+mod components;
+use bevy_kira_audio::AudioPlugin;
 use components::{
     Enemy, Explosion, ExplosionTimer, ExplosionToSpawn, FromEnemy, FromPlayer, Laser, Moveable,
     Player, SpriteSize, Velocity,
 };
-use enemy::EnemyPlugin;
-use player::PlayerPlugin;
 
-mod components;
 mod enemy;
+use enemy::EnemyPlugin;
+
 mod player;
+use player::PlayerPlugin;
 
 const PLAYER_SPRITE: &str = "player_a_01.png";
 const PLAYER_SIZE: (f32, f32) = (144., 75.);
@@ -50,6 +54,12 @@ struct GameTextures {
     enemy: Handle<Image>,
     enemy_laser: Handle<Image>,
     explosion: Handle<TextureAtlas>,
+}
+struct AudioSources {
+    player_laser: Handle<AudioSource>,
+    enemy_laser: Handle<AudioSource>,
+    player_explosion: Handle<AudioSource>,
+    enemy_explosion: Handle<AudioSource>,
 }
 
 struct EnemyCount(u32);
@@ -90,6 +100,7 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugin(AudioPlugin)
         .add_startup_system(setup_system)
         // .add_system(window_posiiton_system)
         .add_system(moveable_system)
@@ -113,6 +124,7 @@ fn setup_system(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    audio: Res<Audio>,
     mut windows: ResMut<Windows>,
 ) {
     // camera
@@ -150,7 +162,19 @@ fn setup_system(
         explosion: explosion,
     };
     commands.insert_resource(game_textures);
+
+    let audio_sources = AudioSources {
+        player_laser: asset_server.load("sounds/sci-fi-sounds/Audio/laserSmall_001.ogg"),
+        enemy_laser: asset_server.load("sounds/sci-fi-sounds/Audio/laserSmall_004.ogg"),
+        player_explosion: asset_server.load("sounds/sci-fi-sounds/Audio/explosionCrunch_004.ogg"),
+        enemy_explosion: asset_server.load("sounds/sci-fi-sounds/Audio/explosionCrunch_000.ogg"),
+    };
+    commands.insert_resource(audio_sources);
+
     commands.insert_resource(EnemyCount(0));
+
+    // let background_audio = asset_server.load("sounds/sci-fi-sounds/Audio/spaceEngine_000.ogg");
+    // audio.play(background_audio).looped();
 }
 
 fn moveable_system(
@@ -180,6 +204,8 @@ fn moveable_system(
 fn player_laser_hit_enemy_system(
     mut commands: Commands,
     mut enemy_count: ResMut<EnemyCount>,
+    audio: Res<Audio>,
+    audio_sources: Res<AudioSources>,
     laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromPlayer>)>,
     enemy_query: Query<(Entity, &Transform, &SpriteSize), With<Enemy>>,
 ) {
@@ -217,6 +243,7 @@ fn player_laser_hit_enemy_system(
                 commands.entity(enemy_entity).despawn();
                 despawned_entities.insert(enemy_entity);
                 enemy_count.0 -= 1;
+                audio.play(audio_sources.enemy_explosion.clone());
 
                 // remove the laser
                 commands.entity(laser_entity).despawn();
@@ -235,6 +262,8 @@ fn enemy_laser_hit_player_system(
     mut commands: Commands,
     mut player_state: ResMut<PlayerState>,
     time: Res<Time>,
+    audio: Res<Audio>,
+    audio_sources: Res<AudioSources>,
     laser_query: Query<(Entity, &Transform, &SpriteSize), (With<Laser>, With<FromEnemy>)>,
     player_query: Query<(Entity, &Transform, &SpriteSize), With<Player>>,
 ) {
@@ -257,6 +286,7 @@ fn enemy_laser_hit_player_system(
                 // remove the player
                 commands.entity(player_entity).despawn();
                 player_state.shot(time.seconds_since_startup());
+                audio.play(audio_sources.player_explosion.clone());
 
                 // remove the laser
                 commands.entity(laser_entity).despawn();

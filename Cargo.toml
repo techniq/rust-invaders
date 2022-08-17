@@ -9,7 +9,20 @@ edition = "2021"
 dev = ["bevy/dynamic"]
 
 [dependencies]
-bevy = "0.8.0"
+# These are the remaining default features other than `bevy_audio` and `vorbis` - https://github.com/bevyengine/bevy/blob/v0.8.0/Cargo.toml#L27-L40
+bevy = { version = "0.8.0", default-features = false, features = [
+  "animation",
+  "bevy_asset",
+  "bevy_gilrs",
+  "bevy_scene",
+  "bevy_winit",
+  "render",
+  "png",
+  "hdr",
+  "x11",
+  "filesystem_watcher",
+] }
+bevy_kira_audio = "0.12.0"
 rand = "0.8.5"
 
 [workspace]

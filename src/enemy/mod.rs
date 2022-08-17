@@ -1,15 +1,15 @@
+use bevy::{ecs::schedule::ShouldRun, prelude::*, time::FixedTimestep};
+use bevy_kira_audio::prelude::*;
+use rand::{thread_rng, Rng};
 use std::f32::consts::PI;
-
-mod formation;
 
 use crate::{
     components::{Enemy, FromEnemy, Laser, Moveable, SpriteSize, Velocity},
-    EnemyCount, GameTextures, WinSize, BASE_SPEED, ENEMY_LASER_SIZE, ENEMY_MAX, ENEMY_SIZE,
-    SPRITE_SCALE, TIME_STEP,
+    AudioSources, EnemyCount, GameTextures, WinSize, BASE_SPEED, ENEMY_LASER_SIZE, ENEMY_MAX,
+    ENEMY_SIZE, SPRITE_SCALE, TIME_STEP,
 };
-use bevy::{ecs::schedule::ShouldRun, prelude::*, time::FixedTimestep};
-use rand::{thread_rng, Rng};
 
+mod formation;
 use self::formation::{Formation, FormationMaker};
 
 pub struct EnemyPlugin;
@@ -80,6 +80,8 @@ fn enemy_fire_criteria() -> ShouldRun {
 fn enemy_fire_system(
     mut commands: Commands,
     game_textures: Res<GameTextures>,
+    audio_sources: Res<AudioSources>,
+    audio: Res<Audio>,
     enemy_query: Query<&Transform, With<Enemy>>,
 ) {
     // println!("Spawning enemy laser")
@@ -102,6 +104,8 @@ fn enemy_fire_system(
             .insert(FromEnemy)
             .insert(Moveable { auto_despan: true })
             .insert(Velocity { x: 0., y: -1. });
+
+        audio.play(audio_sources.enemy_laser.clone());
     }
 }
 

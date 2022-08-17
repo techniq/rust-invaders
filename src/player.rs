@@ -1,9 +1,11 @@
 use bevy::{prelude::*, time::FixedTimestep};
+use bevy_kira_audio::prelude::*;
+use rand::{thread_rng, Rng};
 
 use crate::{
     components::{FromPlayer, Laser, Moveable, Player, SpriteSize, Velocity},
-    GameTextures, PlayerState, WinSize, BASE_SPEED, PLAYER_LASER_SIZE, PLAYER_RESPAWN_DELAY,
-    PLAYER_SIZE, SPRITE_SCALE, TIME_STEP,
+    AudioSources, GameTextures, PlayerState, WinSize, BASE_SPEED, PLAYER_LASER_SIZE,
+    PLAYER_RESPAWN_DELAY, PLAYER_SIZE, SPRITE_SCALE, TIME_STEP,
 };
 
 pub struct PlayerPlugin;
@@ -61,6 +63,8 @@ fn player_fire_system(
     mut commands: Commands,
     kb: Res<Input<KeyCode>>,
     game_textures: Res<GameTextures>,
+    audio_sources: Res<AudioSources>,
+    audio: Res<Audio>,
     query: Query<&Transform, With<Player>>,
 ) {
     if let Ok(player_tf) = query.get_single() {
@@ -83,10 +87,12 @@ fn player_fire_system(
                     .insert(Laser)
                     .insert(SpriteSize::from(PLAYER_LASER_SIZE))
                     .insert(Moveable { auto_despan: true })
-                    .insert(Velocity { x: 0., y: 1. });
+                    .insert(Velocity { x: 0., y: 2. });
             };
             spawn_laser(x_offset);
             spawn_laser(-x_offset);
+
+            audio.play(audio_sources.player_laser.clone());
         }
     }
 }
