@@ -60,6 +60,7 @@ struct AudioSources {
     enemy_laser: Handle<AudioSource>,
     player_explosion: Handle<AudioSource>,
     enemy_explosion: Handle<AudioSource>,
+    background_music: Handle<AudioSource>,
 }
 
 struct EnemyCount(u32);
@@ -168,13 +169,12 @@ fn setup_system(
         enemy_laser: asset_server.load("sounds/sci-fi-sounds/Audio/laserSmall_004.ogg"),
         player_explosion: asset_server.load("sounds/sci-fi-sounds/Audio/explosionCrunch_004.ogg"),
         enemy_explosion: asset_server.load("sounds/sci-fi-sounds/Audio/explosionCrunch_000.ogg"),
+        background_music: asset_server.load("sounds/Space Music Pack/battle.wav"),
     };
+    audio.play(audio_sources.background_music.clone()).looped();
     commands.insert_resource(audio_sources);
 
     commands.insert_resource(EnemyCount(0));
-
-    // let background_audio = asset_server.load("sounds/sci-fi-sounds/Audio/spaceEngine_000.ogg");
-    // audio.play(background_audio).looped();
 }
 
 fn moveable_system(

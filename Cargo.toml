@@ -22,7 +22,7 @@ bevy = { version = "0.8.0", default-features = false, features = [
   "x11",
   "filesystem_watcher",
 ] }
-bevy_kira_audio = "0.12.0"
+bevy_kira_audio = { version = "0.12.0", features = ["ogg", "wav"] }
 rand = "0.8.5"
 
 [workspace]
