@@ -5,8 +5,8 @@ use std::f32::consts::PI;
 
 use crate::{
     components::{Enemy, FromEnemy, Laser, Moveable, SpriteSize, Velocity},
-    AudioSources, EnemyCount, GameTextures, WinSize, BASE_SPEED, ENEMY_LASER_SIZE, ENEMY_MAX,
-    ENEMY_SIZE, SPRITE_SCALE, TIME_STEP,
+    AudioSources, EnemyCount, GameTextures, PlayerState, WinSize, BASE_SPEED, ENEMY_LASER_SIZE,
+    ENEMY_MAX, ENEMY_SIZE, SPRITE_SCALE, TIME_STEP,
 };
 
 mod formation;
@@ -69,8 +69,11 @@ fn enemy_spawn_system(
     }
 }
 
-fn enemy_fire_criteria() -> ShouldRun {
-    if thread_rng().gen_bool(1. / 60.) {
+fn enemy_fire_criteria(player_state: Res<PlayerState>) -> ShouldRun {
+    if !player_state.on {
+        // If player dead, do not shoot (wait spawned)
+        ShouldRun::No
+    } else if thread_rng().gen_bool(1. / 60.) {
         ShouldRun::Yes
     } else {
         ShouldRun::No
