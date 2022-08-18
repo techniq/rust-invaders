@@ -20,8 +20,9 @@ use enemy::EnemyPlugin;
 mod player;
 use player::PlayerPlugin;
 
-const PLAYER_SPRITE: &str = "player_a_01.png";
-const PLAYER_SIZE: (f32, f32) = (144., 75.);
+const PLAYER_SPRITE: &str = "player_b_01.png";
+// const PLAYER_SIZE: (f32, f32) = (144., 75.);
+const PLAYER_SIZE: (f32, f32) = (98., 75.);
 const PLAYER_LASER_SPRITE: &str = "laser_a_01.png";
 const PLAYER_LASER_SIZE: (f32, f32) = (9., 54.);
 

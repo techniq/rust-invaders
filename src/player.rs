@@ -83,13 +83,14 @@ fn player_fire_system(
         if (should_fire) {
             let (x, y) = (player_tf.translation.x, player_tf.translation.y);
             let x_offset = PLAYER_SIZE.0 / 2. * SPRITE_SCALE - 5.;
+            let y_offset = 15.;
 
             let mut spawn_laser = |x_offset: f32| {
                 commands
                     .spawn_bundle(SpriteBundle {
                         texture: game_textures.player_laser.clone(),
                         transform: Transform {
-                            translation: Vec3::new(x + x_offset, y + 15., 0.),
+                            translation: Vec3::new(x + x_offset, y + y_offset, 0.),
                             scale: Vec3::new(SPRITE_SCALE, SPRITE_SCALE, 1.),
                             ..default()
                         },
