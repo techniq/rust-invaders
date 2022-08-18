@@ -8,6 +8,12 @@ edition = "2021"
 [features]
 dev = ["bevy/dynamic"]
 
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
 [dependencies]
 # These are the remaining default features other than `bevy_audio` and `vorbis` - https://github.com/bevyengine/bevy/blob/v0.8.0/Cargo.toml#L27-L40
 bevy = { version = "0.8.0", default-features = false, features = [
