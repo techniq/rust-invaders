@@ -68,6 +68,7 @@ struct EnemyCount(u32);
 struct PlayerState {
     on: bool,       // alive
     last_shot: f64, //a -1 if not shot
+    shooting_timer: Timer,
 }
 
 impl Default for PlayerState {
@@ -75,6 +76,7 @@ impl Default for PlayerState {
         Self {
             on: false,
             last_shot: -1.,
+            shooting_timer: Timer::from_seconds(0.1, true),
         }
     }
 }

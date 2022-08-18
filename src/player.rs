@@ -65,10 +65,22 @@ fn player_fire_system(
     game_textures: Res<GameTextures>,
     audio_sources: Res<AudioSources>,
     audio: Res<Audio>,
+    mut player_state: ResMut<PlayerState>,
+    time: Res<Time>,
     query: Query<&Transform, With<Player>>,
 ) {
     if let Ok(player_tf) = query.get_single() {
-        if kb.just_pressed(KeyCode::Space) {
+        if kb.pressed(KeyCode::Space) {
+            player_state.shooting_timer.tick(time.delta());
+        } else {
+            player_state.shooting_timer.reset();
+        }
+
+        // Fire when space bar initially pressed, and then repeat while being held down
+        let should_fire =
+            kb.just_pressed(KeyCode::Space) || player_state.shooting_timer.just_finished();
+
+        if (should_fire) {
             let (x, y) = (player_tf.translation.x, player_tf.translation.y);
             let x_offset = PLAYER_SIZE.0 / 2. * SPRITE_SCALE - 5.;
 
